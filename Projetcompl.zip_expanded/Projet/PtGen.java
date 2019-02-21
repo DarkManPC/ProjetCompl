@@ -215,10 +215,45 @@ public class PtGen {
 			 UtilLex.messErr("Constante deja declaree");
 			}
 			break;
-		case 6://Ajout constante
-			placeIdent(UtilLex.numId, CONSTANTE, tCour , vCour );
+		case 6://Ajout constante dans tabSymb
+			if(it < MAXSYMB){
+				placeIdent(UtilLex.numId, CONSTANTE, tCour , vCour );
+			}else{
+				UtilLex.messErr("Trop de symbole");
+			}
+
 			break;
-		
+		case 7://type courant = ENT
+			tCour = ENT;
+			break;
+		case 8://type courant = BOOL
+			tCour = BOOL;
+			break;
+		case 9://Ajout de la var dans tabSymb
+			// Doit-on verifier qu'elle existe deja ? /!\/!\
+			if(it < MAXSYMB){
+				int addrVar;
+				if(tabSymb[it].categorie == CONSTANTE){
+					addrVar = 0;
+				}else{
+					addrVar = tabSymb[it].info + 1;
+				}
+				placeIdent(UtilLex.numId, VARGLOBALE, tCour, addrVar);
+			}else{
+				UtilLex.messErr("Trop de symbole");
+			}
+			break;
+		case 10://Production du code MAPILE pour la creation des var
+			if(tabSymb[it].categorie == VARGLOBALE){
+				int nbVar = tabSymb[it].info + 1;
+				po.produire(RESERVER);
+				po.produire(nbVar);
+			}else{
+				UtilLex.messErr("Pas de variable dans tabSymb");
+			}
+			break;
+		case 11:// Me souviens plus de ce qu'il est sensé faire
+			break;
 
 		// A COMPLETER
 		
