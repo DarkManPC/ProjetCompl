@@ -175,7 +175,7 @@ exp5  : primaire
         )*
   ;
   
-primaire: valeur 
+primaire: valeur {PtGen.pt(36);}
   | ident  {PtGen.pt(20);}
   | '(' expression ')'
   ;

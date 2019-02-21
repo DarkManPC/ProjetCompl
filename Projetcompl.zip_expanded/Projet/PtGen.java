@@ -192,6 +192,9 @@ public class PtGen {
 		case 0:
 			initialisations();
 			break;
+
+		/**** Declaration ****/
+
 		case 1: // recuperation d'un entier positif
 			tCour = ENT;
 		    vCour = UtilLex.valNb  ;
@@ -254,6 +257,94 @@ public class PtGen {
 			break;
 		case 11:// Me souviens plus de ce qu'il est sensé faire
 			break;
+
+		/**** Expression ****/
+
+		case 20://Recuperation et ajout numId dans la pile
+			int posIdent = presentIdent(1);
+			if(posIdent > 0){
+				if(tabSymb[posIdent].categorie == CONSTANTE){
+					po.produire(EMPILER);
+					po.produire(tabSymb[posIdent].info);
+				}else if(tabSymb[posIdent].categorie == VARGLOBALE){
+					po.produire(CONTENUG);
+					po.produire(tabSymb[posIdent].info);
+				}else{
+					UtilLex.messErr("Ident n'est ni une variable, ni une constante");
+				}
+			}else{
+				UtilLex.messErr("Variable ou constante inexistante");
+			}
+			break;
+		case 21://verification tCour = BOOL
+			verifBool();
+			break;
+		case 22://verification tCour = BOOL + produire OU
+			verifBool();
+			po.produire(OU);
+			break;
+		case 23://verification tCour = BOOL + produire ET
+			verifBool();
+			po.produire(ET);
+			break;
+		case 24://verification tCour = BOOL + produire NON
+			verifBool();
+			po.produire(NON);
+			break;
+		case 25://verification tCour = ENT
+			verifEnt();;
+			break;
+		case 26://verification tCour = ENT + produire = + tCour = BOOL
+			verifEnt();;
+			po.produire(EG);
+			tCour = BOOL;
+			break;
+		case 27://verification tCour = ENT + produire <> + tCour = BOOL
+			verifEnt();;
+			po.produire(DIFF);
+			tCour = BOOL;
+			break;
+		case 28://verification tCour = ENT + produire > + tCour = BOOL
+			verifEnt();;
+			po.produire(SUP);
+			tCour = BOOL;
+			break;
+		case 29://verification tCour = ENT + produire >= + tCour = BOOL
+			verifEnt();;
+			po.produire(SUPEG);
+			tCour = BOOL;	
+			break;
+		case 30://verification tCour = ENT + produire < + tCour = BOOL	
+			verifEnt();;
+			po.produire(INF);
+			tCour = BOOL;
+			break;
+		case 31://verification tCour = ENT + produire <= + tCour = BOOL
+			verifEnt();;
+			po.produire(INFEG);
+			tCour = BOOL;
+			break;
+		case 32://verification tCour = ENT + produire ADD
+			verifEnt();;
+			po.produire(ADD);
+			break;
+		case 33://verification tCour = ENT + produire SOUS
+			verifEnt();;
+			po.produire(SOUS);
+			break;
+		case 34://verification tCour = ENT + produire MUL
+			verifEnt();;
+			po.produire(MUL);
+			break;
+		case 35://verification tCour = ENT + produire DIV
+			verifEnt();;
+			po.produire(DIV);
+			break;
+		case 36://Ajout dans la pile de vCour
+			po.produire(EMPILER);
+			po.produire(vCour);
+			break;
+
 
 		// A COMPLETER
 		
