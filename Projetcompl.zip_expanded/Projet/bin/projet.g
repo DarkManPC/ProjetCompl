@@ -125,14 +125,14 @@ inscond : 'cond'  expression  ':' instructions
 boucle  : 'ttq'  expression 'faire' instructions 'fait' 
   ;
   
-lecture: 'lire' '(' ident  ( ',' ident  )* ')' 
+lecture: 'lire' '(' ident {PtGen.pt(41);} ( ',' ident {PtGen.pt(41);} )* ')' 
   ;
   
-ecriture: 'ecrire' '(' expression  ( ',' expression  )* ')'
+ecriture: 'ecrire' '(' expression {PtGen.pt(40);}  ( ',' expression {PtGen.pt(40);} )* ')'
    ;
   
 affouappel
-  : ident  (    ':=' expression 
+  : ident  (    ':=' expression {PtGen.pt(50);}
             |   (effixes (effmods)?)?  
            )
   ;

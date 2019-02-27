@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry excluding="libclass/" kind="src" path=""/>
-	<classpathentry kind="lib" path="/Users/guillaume/Desktop/Cours/INFO/S6/COMPL/TP/antlr-3.5.2-complete.jar"/>
 	<classpathentry kind="lib" path="libclass"/>
+	<classpathentry kind="lib" path="H:/workspace_compl/ProjetCompl/antlr-3.5.2-complete.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
