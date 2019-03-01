@@ -27,7 +27,7 @@ import java.io.*;
 // (verifications semantiques + production du code objet)
 
 public class PtGen {
-
+	static int affect = 0;
 	// constantes manipulees par le compilateur
 	// ----------------------------------------
 
@@ -183,6 +183,7 @@ public class PtGen {
 	// -----------------------------------------
 	public static void pt(int numGen) {
 
+		
 		switch (numGen) {
 		case 0:
 			initialisations();
@@ -368,9 +369,8 @@ public class PtGen {
 			}
 
 			break;
-
 		case 50: // Affect
-			tmp = presentIdent(1);
+			tmp = affect;//presentIdent(1);
 			if (tmp > 0 && tabSymb[tmp].categorie == VARGLOBALE
 					&& ((tabSymb[tmp].type == ENT && tCour == ENT) || (tabSymb[tmp].type == BOOL && tCour == BOOL))) {
 				po.produire(AFFECTERG);
@@ -379,6 +379,10 @@ public class PtGen {
 				UtilLex.messErr("Mauvais type ou var inexistante ptgen50");
 			}
 			break;
+		case 51:
+			affect = presentIdent(1);
+			break;
+			
 
 		// A COMPLETER
 
@@ -388,5 +392,7 @@ public class PtGen {
 
 		}
 		afftabSymb();
+		po.constObj();
+		po.constGen();
 	}
 }
