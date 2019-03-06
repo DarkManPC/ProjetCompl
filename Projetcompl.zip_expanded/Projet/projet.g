@@ -41,7 +41,7 @@ unite  :   unitprog  EOF
 unitprog
   : 'programme' ident ':'  
      declarations  
-     corps { System.out.println("succes, arret de la compilation "); }
+     corps {PtGen.pt(123);} { System.out.println("succes, arret de la compilation "); }
   ;
   
 unitmodule
@@ -117,9 +117,9 @@ inssi : 'si' expression {PtGen.pt(100);} 'alors' instructions ('sinon' {PtGen.pt
   ;
   
 inscond : 'cond' {PtGen.pt(120);} expression {PtGen.pt(121);}  ':' instructions 
-          (',' {PtGen.pt(122);} expression {PtGen.pt(123);} ':' instructions )* 
-          ('aut'  instructions |  ) 
-          'fcond' {PtGen.pt(124);}
+          (',' {PtGen.pt(122);} expression {PtGen.pt(121);} ':' instructions )* 
+          ('aut' {PtGen.pt(122);}  instructions |  ) 
+          'fcond' {PtGen.pt(123);}
   ;
   
 boucle  : 'ttq' {PtGen.pt(110);} expression {PtGen.pt(111);} 'faire' instructions 'fait' {PtGen.pt(112);} 

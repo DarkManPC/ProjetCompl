@@ -392,34 +392,65 @@ public class PtGen {
 			verifBool();
 			po.produire(BSIFAUX);
 			po.produire(-1);
+			pileRep.empiler(po.getIpo());
 			break;
 		case 101: // production code MAPILE "sinon"
+			po.produire(BINCOND);
+			po.produire(-1);
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			pileRep.empiler(po.getIpo());
 			break;
 		case 102: // depilement pile reprise + mise a jour code MAPILE
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			break;
 			
 			/**** ttq ****/
 			
 		case 110: // preparation pile reprise
+			pileRep.empiler(po.getIpo()+1);
 			break;
 		case 111: // Verification expression bool + production MAPILE "ttq" + actualisation pile reprise
+			verifBool();
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
 			break;
 		case 112: // depilement pile reprise + mise a jour code MAPILE
+			po.modifier(pileRep.depiler(), po.getIpo()+3);
+			po.produire(BINCOND);
+			po.produire(pileRep.depiler());
 			break;
 		
 			/**** cond ****/
 		
 		case 120: // preparation pile reprise avec 0
+			pileRep.empiler(0);
 			break;
-		case 121: // verif bool + mise a jour pile reprise
+		case 121: // verif bool + mise a jour pile reprise + production MAPILE "cond"
+			verifBool();
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
 			break;
 		case 122: // actualisation pile reprise + mise a jour code MAPILE
+			po.modifier(pileRep.depiler(), po.getIpo()+3);
+			po.produire(BINCOND);
+			po.produire(pileRep.depiler());
+			pileRep.empiler(po.getIpo());
 			break;
 		case 123: // mise a jour pile reprise
-			break;
-		case 124: // mise a jour code MAPILE recursif pour les bincond
+			int bincond = po.getIpo()+1;
+			int elt = pileRep.depiler();
+			while(po.getElt(elt) != 0) {
+				
+			}
 			break;
 
+		/**** Arret ****/
+			
+		case 999:
+			po.produire(ARRET);
+			break;
 		
 		
 		// A COMPLETER
