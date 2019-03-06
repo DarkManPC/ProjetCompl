@@ -345,6 +345,9 @@ public class PtGen {
 			po.produire(EMPILER);
 			po.produire(vCour);
 			break;
+			
+			/**** Ecriture / Lecture / Affectation ****/
+			
 		case 40:// Ecriture
 			if (tCour == BOOL) {
 				po.produire(ECRBOOL);
@@ -383,7 +386,42 @@ public class PtGen {
 			affect = presentIdent(1);
 			break;
 			
+		/**** Conditions ****/
+			/**** si ****/
+		case 100: // Verification expression bool + production MAPILE "si" + preparation pile reprise
+			verifBool();
+			po.produire(BSIFAUX);
+			po.produire(-1);
+			break;
+		case 101: // production code MAPILE "sinon"
+			break;
+		case 102: // depilement pile reprise + mise a jour code MAPILE
+			break;
+			
+			/**** ttq ****/
+			
+		case 110: // preparation pile reprise
+			break;
+		case 111: // Verification expression bool + production MAPILE "ttq" + actualisation pile reprise
+			break;
+		case 112: // depilement pile reprise + mise a jour code MAPILE
+			break;
+		
+			/**** cond ****/
+		
+		case 120: // preparation pile reprise avec 0
+			break;
+		case 121: // verif bool + mise a jour pile reprise
+			break;
+		case 122: // actualisation pile reprise + mise a jour code MAPILE
+			break;
+		case 123: // mise a jour pile reprise
+			break;
+		case 124: // mise a jour code MAPILE recursif pour les bincond
+			break;
 
+		
+		
 		// A COMPLETER
 
 		default:
