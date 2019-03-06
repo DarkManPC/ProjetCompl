@@ -441,8 +441,9 @@ public class PtGen {
 		case 123: // mise a jour pile reprise
 			int bincond = po.getIpo()+1;
 			int elt = pileRep.depiler();
-			while(po.getElt(elt) != 0) {
-				
+			while(elt != 0) {
+				po.modifier(elt, bincond);
+				elt = po.getElt(elt);
 			}
 			break;
 
