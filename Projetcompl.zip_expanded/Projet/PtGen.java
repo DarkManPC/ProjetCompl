@@ -235,7 +235,7 @@ public class PtGen {
 			}
 			if (it < MAXSYMB) {
 				int addrVar;
-				if (tabSymb[it].categorie == CONSTANTE) {
+				if (it == 0 || tabSymb[it].categorie == CONSTANTE) {
 					addrVar = 0;
 				} else {
 					addrVar = tabSymb[it].info + 1;
@@ -438,12 +438,25 @@ public class PtGen {
 			po.produire(pileRep.depiler());
 			pileRep.empiler(po.getIpo());
 			break;
-		case 123: // mise a jour pile reprise
+		case 123: // actualisation pile reprise + mise a jour code MAPILE pour"aut"
+			po.modifier(pileRep.depiler(), po.getIpo()+3);
+			po.produire(BINCOND);
+			po.produire(pileRep.depiler());
+			pileRep.empiler(po.getIpo());
+			break;
+		case 124: // actualisation pile reprise popur "aut"
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			break;
+		case 125: // mise a jour pile reprise
 			int bincond = po.getIpo()+1;
 			int elt = pileRep.depiler();
+			
 			while(elt != 0) {
+				po.constGen();
+				System.out.println(elt + " / " +bincond);
+				tmp = po.getElt(elt);
 				po.modifier(elt, bincond);
-				elt = po.getElt(elt);
+				elt = tmp;
 			}
 			break;
 
@@ -451,6 +464,7 @@ public class PtGen {
 			
 		case 999:
 			po.produire(ARRET);
+			afftabSymb();
 			break;
 		
 		
@@ -461,8 +475,8 @@ public class PtGen {
 			break;
 
 		}
-		afftabSymb();
 		po.constObj();
 		po.constGen();
+
 	}
 }

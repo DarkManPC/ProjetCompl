@@ -5,6 +5,6 @@
 
 :: Commande si antlr-3.5.2-complete.jar EST COPIE SOUS VOTRE REPERTOIRE
 ::    -> pensez alors à indiquer le chemin correct
- java -cp H:\workspace_compl\ProjetCompl\antlr-3.5.2-complete.jar org.antlr.Tool %*
+ java -cp C:\Users\Guillaume\Documents\Code\Java\ProjetCompl\antlr-3.5.2-complete.jar org.antlr.Tool %*
 
 
