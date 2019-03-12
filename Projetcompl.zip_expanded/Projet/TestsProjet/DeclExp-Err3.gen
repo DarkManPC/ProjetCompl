@@ -1,0 +1,5 @@
+FICHIER TestsProjet/DeclExp-Err3.gen : 
+
+   1  reserver        5
+   3  empiler        77
+   5  contenug        2

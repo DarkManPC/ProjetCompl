@@ -1,4 +1,6 @@
 
+// RONCIER_LABBE_LONGRAIS
+
 /*********************************************************************************
  * VARIABLES ET METHODES FOURNIES PAR LA CLASSE UtilLex (cf libclass)            *
  *       complement à l'ANALYSEUR LEXICAL produit par ANTLR                      *
@@ -452,8 +454,6 @@ public class PtGen {
 			int elt = pileRep.depiler();
 			
 			while(elt != 0) {
-				po.constGen();
-				System.out.println(elt + " / " +bincond);
 				tmp = po.getElt(elt);
 				po.modifier(elt, bincond);
 				elt = tmp;
@@ -475,7 +475,7 @@ public class PtGen {
 			break;
 
 		}
-		po.constObj();
+		//po.constObj();
 		po.constGen();
 
 	}
