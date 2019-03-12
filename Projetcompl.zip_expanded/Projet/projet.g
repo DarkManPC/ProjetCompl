@@ -92,13 +92,13 @@ corps : 'debut' instructions 'fin'
 parfixe: 'fixe' '(' pf ( ';' pf)* ')'
   ;
   
-pf  : type ident {PtGen.pt(203);} ( ',' ident {PtGen.pt(204);} )*  
+pf  : type ident {PtGen.pt(203);} ( ',' ident {PtGen.pt(203);} )*  
   ;
 
 parmod  : 'mod' '(' pm ( ';' pm)* ')'
   ;
   
-pm  : type ident {PtGen.pt(205);} ( ',' ident {PtGen.pt(206);} )*
+pm  : type ident {PtGen.pt(204);} ( ',' ident {PtGen.pt(204);} )*
   ;
   
 instructions

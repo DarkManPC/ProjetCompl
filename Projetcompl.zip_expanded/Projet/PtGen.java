@@ -30,7 +30,6 @@ import java.io.*;
 
 public class PtGen {
 	static int affect = 0;
-	static int typeParamProc = 0;
 	static int categorieVar = 0;
 	// constantes manipulees par le compilateur
 	// ----------------------------------------
@@ -152,7 +151,7 @@ public class PtGen {
 			} else
 				Ecriture.ecrireInt(i, 6);
 			if (tabSymb[i] == null)
-				System.out.println(" r�f�rence NULL");
+				System.out.println(" reference NULL");
 			else
 				System.out.println(" " + tabSymb[i]);
 		}
@@ -487,10 +486,7 @@ public class PtGen {
 			placeIdent(-1, PRIVEE, NEUTRE, -1);
 			bc = it+1;
 			break;
-		case 203: // sauvegarde du type du parametre
-			typeParamProc = UtilLex.numId;
-			break;
-		case 204: // ajout du paramfixe dans tabSymb
+		case 203: // ajout du paramfixe dans tabSymb
 			if (presentIdent(bc) > 0) {
 				UtilLex.messErr("paramfixe deja declaree");
 			}
@@ -503,16 +499,13 @@ public class PtGen {
 				} else {
 					UtilLex.messErr("Erreur ajout parametre fixe");
 				}
-				placeIdent(UtilLex.numId, PARAMFIXE, typeParamProc, addrVar);
+				placeIdent(UtilLex.numId, PARAMFIXE, tCour, addrVar);
 				
 			} else {
 				UtilLex.messErr("Trop de symbole");
 			}
 			break;
-		case 205: // sauvegarde du type du parametre
-			typeParamProc = UtilLex.numId;
-			break;
-		case 206: // ajout du parammod dans tabSymb
+		case 204: // ajout du parammod dans tabSymb
 			if (presentIdent(bc) > 0) {
 				UtilLex.messErr("parammod deja declaree");
 			}
@@ -520,18 +513,18 @@ public class PtGen {
 				int addrVar = -1;
 				if (tabSymb[it].categorie == PRIVEE) {
 					addrVar = 0;
-				} else if(tabSymb[it].categorie == PARAMMOD) {
+				} else if(tabSymb[it].categorie == PARAMMOD || tabSymb[it].categorie == PARAMFIXE) {
 					addrVar = tabSymb[it].info + 1;
 				} else {
 					UtilLex.messErr("Erreur ajout parametre mod");
 				}
-				placeIdent(UtilLex.numId, PARAMMOD, typeParamProc, addrVar);
+				placeIdent(UtilLex.numId, PARAMMOD, tCour, addrVar);
 			} else {
 				UtilLex.messErr("Trop de symbole");
 			}
 			break;
 		case 207: // Actualisation du nombre de parametres de la proc
-			tabSymb[bc-1].info = it - bc;
+			tabSymb[bc-1].info = it - bc + 1;
 			break;
 		case 208:// Sauvegarde de la categorie de la variable
 			categorieVar = VARLOCALE;
