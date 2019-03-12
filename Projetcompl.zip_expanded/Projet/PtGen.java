@@ -30,6 +30,8 @@ import java.io.*;
 
 public class PtGen {
 	static int affect = 0;
+	static int typeParamProc = 0;
+	static int categorieVar = 0;
 	// constantes manipulees par le compilateur
 	// ----------------------------------------
 
@@ -212,7 +214,7 @@ public class PtGen {
 			vCour = 0;
 			break;
 		case 5:// Verification presence constante
-			if (presentIdent(1) > 0) {
+			if (presentIdent(bc) > 0) {
 				UtilLex.messErr("Constante deja declaree");
 			}
 			break;
@@ -239,10 +241,13 @@ public class PtGen {
 				int addrVar;
 				if (it == 0 || tabSymb[it].categorie == CONSTANTE) {
 					addrVar = 0;
+				}
+				else if(tabSymb[it].categorie == PARAMFIXE || tabSymb[it].categorie == PARAMMOD) {
+					addrVar = tabSymb[it].info + 3;
 				} else {
 					addrVar = tabSymb[it].info + 1;
 				}
-				placeIdent(UtilLex.numId, VARGLOBALE, tCour, addrVar);
+				placeIdent(UtilLex.numId, categorieVar, tCour, addrVar);
 			} else {
 				UtilLex.messErr("Trop de symbole");
 			}
@@ -252,11 +257,18 @@ public class PtGen {
 				int nbVar = tabSymb[it].info + 1;
 				po.produire(RESERVER);
 				po.produire(nbVar);
+			} else if(tabSymb[it].categorie == VARLOCALE) {
+				int nbVar = tabSymb[it].info - (tabSymb[bc-1].info + 1);
+				po.produire(RESERVER);
+				po.produire(nbVar);
 			} else {
 				UtilLex.messErr("Pas de variable dans tabSymb");
 			}
 			break;
 		case 11:// Me souviens plus de ce qu'il est sensé faire
+			break;
+		case 12:// Sauvegarde de la categorie de la variable
+			categorieVar = VARGLOBALE;
 			break;
 
 		/**** Expression ****/
@@ -459,6 +471,80 @@ public class PtGen {
 				elt = tmp;
 			}
 			break;
+			
+		/**** Proc ****/
+			
+		case 200: // creation BINCOND avant procs + pileRep
+			po.produire(BINCOND);
+			po.produire(-1);
+			pileRep.empiler(po.getIpo());
+			break;
+		case 201: // Actualisation BINCOND avant procs + pileRep
+			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			break;
+		case 202: // ajout de la proc dans tabSymb
+			placeIdent(UtilLex.numId, PROC, NEUTRE, po.getIpo()+1);
+			placeIdent(-1, PRIVEE, NEUTRE, -1);
+			bc = it+1;
+			break;
+		case 203: // sauvegarde du type du parametre
+			typeParamProc = UtilLex.numId;
+			break;
+		case 204: // ajout du paramfixe dans tabSymb
+			if (presentIdent(bc) > 0) {
+				UtilLex.messErr("paramfixe deja declaree");
+			}
+			if (it < MAXSYMB) {
+				int addrVar = -1;
+				if (tabSymb[it].categorie == PRIVEE) {
+					addrVar = 0;
+				} else if(tabSymb[it].categorie == PARAMFIXE) {
+					addrVar = tabSymb[it].info + 1;
+				} else {
+					UtilLex.messErr("Erreur ajout parametre fixe");
+				}
+				placeIdent(UtilLex.numId, PARAMFIXE, typeParamProc, addrVar);
+				
+			} else {
+				UtilLex.messErr("Trop de symbole");
+			}
+			break;
+		case 205: // sauvegarde du type du parametre
+			typeParamProc = UtilLex.numId;
+			break;
+		case 206: // ajout du parammod dans tabSymb
+			if (presentIdent(bc) > 0) {
+				UtilLex.messErr("parammod deja declaree");
+			}
+			if (it < MAXSYMB) {
+				int addrVar = -1;
+				if (tabSymb[it].categorie == PRIVEE) {
+					addrVar = 0;
+				} else if(tabSymb[it].categorie == PARAMMOD) {
+					addrVar = tabSymb[it].info + 1;
+				} else {
+					UtilLex.messErr("Erreur ajout parametre mod");
+				}
+				placeIdent(UtilLex.numId, PARAMMOD, typeParamProc, addrVar);
+			} else {
+				UtilLex.messErr("Trop de symbole");
+			}
+			break;
+		case 207: // Actualisation du nombre de parametres de la proc
+			tabSymb[bc-1].info = it - bc;
+			break;
+		case 208:// Sauvegarde de la categorie de la variable
+			categorieVar = VARLOCALE;
+			break;
+		case 209:// gestion du retour de la proc
+			po.produire(RETOUR);
+			po.produire(tabSymb[bc-1].info);
+			it = (bc + tabSymb[bc-1].info - 1);
+			for(int i = bc; i <= it; i++) {
+				tabSymb[i].code = -1;
+			}
+			bc = 1;
+			break;
 
 		/**** Arret ****/
 			
@@ -476,6 +562,7 @@ public class PtGen {
 
 		}
 		//po.constObj();
+		afftabSymb();
 		po.constGen();
 
 	}
