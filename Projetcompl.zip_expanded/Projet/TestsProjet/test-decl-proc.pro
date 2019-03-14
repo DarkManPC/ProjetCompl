@@ -13,6 +13,12 @@ debut
 	ecrire(2);
 fin;
 
+proc p3 
+	var ent d, e; bool f;
+debut
+	ecrire(2);
+fin;
+
 debut
 	lire(n);
 	fact(n)(fn); 

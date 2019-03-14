@@ -1,7 +1,7 @@
 FICHIER TestsProjet/test-decl-proc.gen : 
 
    1  reserver        2
-   3  bincond        19
+   3  bincond        26
    5  reserver        1
    7  empiler         2
    9  ecrent    
@@ -10,9 +10,13 @@ FICHIER TestsProjet/test-decl-proc.gen :
   14  empiler         2
   16  ecrent    
   17  retour          3
-  19  lirent    
-  20  affecterg       0
-  22  contenug        0
-  24  contenug        1
-  26  ecrent    
-  27  arret     
+  19  reserver        1
+  21  empiler         2
+  23  ecrent    
+  24  retour          0
+  26  lirent    
+  27  affecterg       0
+  29  contenug        0
+  31  contenug        1
+  33  ecrent    
+  34  arret     

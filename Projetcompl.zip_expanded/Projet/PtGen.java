@@ -238,7 +238,7 @@ public class PtGen {
 			}
 			if (it < MAXSYMB) {
 				int addrVar;
-				if (it == 0 || tabSymb[it].categorie == CONSTANTE) {
+				if (it == 0 || tabSymb[it].categorie == CONSTANTE || tabSymb[it].categorie == PRIVEE) {
 					addrVar = 0;
 				}
 				else if(tabSymb[it].categorie == PARAMFIXE || tabSymb[it].categorie == PARAMMOD) {
@@ -482,13 +482,16 @@ public class PtGen {
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			break;
 		case 202: // ajout de la proc dans tabSymb
+			if(presentIdent(bc) > 0){
+				UtilLex.messErr("proc deja declaree");
+			}
 			placeIdent(UtilLex.numId, PROC, NEUTRE, po.getIpo()+1);
 			placeIdent(-1, PRIVEE, NEUTRE, -1);
 			bc = it+1;
 			break;
 		case 203: // ajout du paramfixe dans tabSymb
 			if (presentIdent(bc) > 0) {
-				UtilLex.messErr("paramfixe deja declaree");
+				UtilLex.messErr("paramfixe deja declare");
 			}
 			if (it < MAXSYMB) {
 				int addrVar = -1;
