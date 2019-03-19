@@ -1,0 +1,10 @@
+FICHIER TestsProjet/DeclExp-Err2.gen : 
+
+   1  reserver        5
+   3  empiler        77
+   5  empiler         7
+   7  sous      
+   8  empiler         2
+  10  div       
+  11  affecterg       0
+  13  empiler         1

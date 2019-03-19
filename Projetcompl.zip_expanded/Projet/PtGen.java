@@ -214,14 +214,14 @@ public class PtGen {
 			break;
 		case 5:// Verification presence constante
 			if (presentIdent(bc) > 0) {
-				UtilLex.messErr("Constante deja declaree");
+				UtilLex.messErr("Constante deja declaree ptgen 5");
 			}
 			break;
 		case 6:// Ajout constante dans tabSymb
 			if (it < MAXSYMB) {
 				placeIdent(UtilLex.numId, CONSTANTE, tCour, vCour);
 			} else {
-				UtilLex.messErr("Trop de symbole");
+				UtilLex.messErr("Trop de symbole ptgen 6");
 			}
 
 			break;
@@ -234,7 +234,7 @@ public class PtGen {
 		case 9:// Ajout de la var dans tabSymb
 				// Doit-on verifier qu'elle existe deja ? /!\/!\
 			if (presentIdent(1) > 0) {
-				UtilLex.messErr("deja declaree");
+				UtilLex.messErr("Ident deja declaree ptgen 9");
 			}
 			if (it < MAXSYMB) {
 				int addrVar;
@@ -248,7 +248,7 @@ public class PtGen {
 				}
 				placeIdent(UtilLex.numId, categorieVar, tCour, addrVar);
 			} else {
-				UtilLex.messErr("Trop de symbole");
+				UtilLex.messErr("Trop de symbole dans TabSymb ptgen 9");
 			}
 			break;
 		case 10:// Production du code MAPILE pour la creation des var
@@ -261,7 +261,7 @@ public class PtGen {
 				po.produire(RESERVER);
 				po.produire(nbVar);
 			} else {
-				UtilLex.messErr("Pas de variable dans tabSymb");
+				UtilLex.messErr("Pas de variable dans tabSymb ptgen 10");
 			}
 			break;
 		case 11:// Me souviens plus de ce qu'il est sensé faire
@@ -284,10 +284,10 @@ public class PtGen {
 					po.produire(CONTENUG);
 					po.produire(tabSymb[posIdent].info);
 				} else {
-					UtilLex.messErr("Ident n'est ni une variable, ni une constante");
+					UtilLex.messErr("Ident n'est ni une variable, ni une constante ptgen 20");
 				}
 			} else {
-				UtilLex.messErr("Variable ou constante inexistante");
+				UtilLex.messErr("Variable ou constante inexistante ptgen 20");
 			}
 			break;
 		case 21:// verification tCour = BOOL
@@ -367,11 +367,11 @@ public class PtGen {
 			} else if (tCour == ENT) {
 				po.produire(ECRENT);
 			} else {
-				UtilLex.messErr("Ecriture impossible car pas bool ni ent ptgen40");
+				UtilLex.messErr("Ecriture impossible car pas bool ni ent ptgen 40");
 			}
 			break;
 		case 41:// Lecture
-			int tmp = presentIdent(1);
+			int tmp = presentIdent(bc);
 			if (tmp > 0 && tabSymb[tmp].type == ENT) {
 				po.produire(LIRENT);
 				po.produire(AFFECTERG);
@@ -381,54 +381,68 @@ public class PtGen {
 				po.produire(AFFECTERG);
 				po.produire(tabSymb[tmp].info);
 			} else {
-				UtilLex.messErr("Lecture impossible, var inexistante ptgen41");
+				UtilLex.messErr("Lecture impossible, var inexistante ptgen 41");
 			}
 
 			break;
-		case 50: // Affect
-			tmp = affect;//presentIdent(1);
+		case 50: // Affect [PROC OK]
+			tmp = affect; 
 			if (tmp > 0 && tabSymb[tmp].categorie == VARGLOBALE
 					&& ((tabSymb[tmp].type == ENT && tCour == ENT) || (tabSymb[tmp].type == BOOL && tCour == BOOL))) {
 				po.produire(AFFECTERG);
 				po.produire(tabSymb[tmp].info);
-			} else {
-				UtilLex.messErr("Mauvais type ou var inexistante ptgen50");
+			} else if(tmp > 0 && tabSymb[tmp].categorie == VARLOCALE
+					&& ((tabSymb[tmp].type == ENT && tCour == ENT) || (tabSymb[tmp].type == BOOL && tCour == BOOL))){
+				po.produire(AFFECTERL);
+				po.produire(tabSymb[tmp].info);
+				po.produire(0);
+			} else if(tmp > 0 && tabSymb[tmp].categorie == PARAMMOD
+					&& ((tabSymb[tmp].type == ENT && tCour == ENT) || (tabSymb[tmp].type == BOOL && tCour == BOOL))){
+				po.produire(AFFECTERL);
+				po.produire(tabSymb[tmp].info);
+				po.produire(1);
+			} else if (tmp > 0 ){
+				UtilLex.messErr(UtilLex.repId(tabSymb[tmp].code) + " : Mauvais type ptgen 50");
+			}else {
+				UtilLex.messErr("var inexistante ptgen 50");
 			}
 			break;
-		case 51:
-			affect = presentIdent(1);
+		case 51: // Sauvegarde var affect dest [PROC OK]
+			affect = presentIdent(bc);
 			break;
 			
 		/**** Conditions ****/
+
 			/**** si ****/
-		case 100: // Verification expression bool + production MAPILE "si" + preparation pile reprise
+			
+		case 100: // Verification expression bool + production MAPILE "si" + preparation pile reprise [PROC OK]
 			verifBool();
 			po.produire(BSIFAUX);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());
 			break;
-		case 101: // production code MAPILE "sinon"
+		case 101: // production code MAPILE "sinon" [PROC OK]
 			po.produire(BINCOND);
 			po.produire(-1);
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			pileRep.empiler(po.getIpo());
 			break;
-		case 102: // depilement pile reprise + mise a jour code MAPILE
+		case 102: // depilement pile reprise + mise a jour code MAPILE [PROC OK]
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			break;
 			
 			/**** ttq ****/
 			
-		case 110: // preparation pile reprise
+		case 110: // preparation pile reprise [PROC OK]
 			pileRep.empiler(po.getIpo()+1);
 			break;
-		case 111: // Verification expression bool + production MAPILE "ttq" + actualisation pile reprise
+		case 111: // Verification expression bool + production MAPILE "ttq" + actualisation pile reprise [PROC OK]
 			verifBool();
 			po.produire(BSIFAUX);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());
 			break;
-		case 112: // depilement pile reprise + mise a jour code MAPILE
+		case 112: // depilement pile reprise + mise a jour code MAPILE [PROC OK]
 			po.modifier(pileRep.depiler(), po.getIpo()+3);
 			po.produire(BINCOND);
 			po.produire(pileRep.depiler());
@@ -436,31 +450,31 @@ public class PtGen {
 		
 			/**** cond ****/
 		
-		case 120: // preparation pile reprise avec 0
+		case 120: // preparation pile reprise avec 0 [PROC OK]
 			pileRep.empiler(0);
 			break;
-		case 121: // verif bool + mise a jour pile reprise + production MAPILE "cond"
+		case 121: // verif bool + mise a jour pile reprise + production MAPILE "cond" [PROC OK]
 			verifBool();
 			po.produire(BSIFAUX);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());
 			break;
-		case 122: // actualisation pile reprise + mise a jour code MAPILE
+		case 122: // actualisation pile reprise + mise a jour code MAPILE [PROC OK]
 			po.modifier(pileRep.depiler(), po.getIpo()+3);
 			po.produire(BINCOND);
 			po.produire(pileRep.depiler());
 			pileRep.empiler(po.getIpo());
 			break;
-		case 123: // actualisation pile reprise + mise a jour code MAPILE pour"aut"
+		case 123: // actualisation pile reprise + mise a jour code MAPILE pour"aut" [PROC OK]
 			po.modifier(pileRep.depiler(), po.getIpo()+3);
 			po.produire(BINCOND);
 			po.produire(pileRep.depiler());
 			pileRep.empiler(po.getIpo());
 			break;
-		case 124: // actualisation pile reprise popur "aut"
+		case 124: // actualisation pile reprise popur "aut" [PROC OK]
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			break;
-		case 125: // mise a jour pile reprise
+		case 125: // mise a jour pile reprise [PROC OK]
 			int bincond = po.getIpo()+1;
 			int elt = pileRep.depiler();
 			
@@ -483,7 +497,7 @@ public class PtGen {
 			break;
 		case 202: // ajout de la proc dans tabSymb
 			if(presentIdent(bc) > 0){
-				UtilLex.messErr("proc deja declaree");
+				UtilLex.messErr("proc deja declaree ptgen 202");
 			}
 			placeIdent(UtilLex.numId, PROC, NEUTRE, po.getIpo()+1);
 			placeIdent(-1, PRIVEE, NEUTRE, -1);
@@ -491,7 +505,7 @@ public class PtGen {
 			break;
 		case 203: // ajout du paramfixe dans tabSymb
 			if (presentIdent(bc) > 0) {
-				UtilLex.messErr("paramfixe deja declare");
+				UtilLex.messErr("paramfixe deja declare ptgen 203");
 			}
 			if (it < MAXSYMB) {
 				int addrVar = -1;
@@ -500,17 +514,17 @@ public class PtGen {
 				} else if(tabSymb[it].categorie == PARAMFIXE) {
 					addrVar = tabSymb[it].info + 1;
 				} else {
-					UtilLex.messErr("Erreur ajout parametre fixe");
+					UtilLex.messErr("Erreur ajout parametre fixe ptgen 203");
 				}
 				placeIdent(UtilLex.numId, PARAMFIXE, tCour, addrVar);
 				
 			} else {
-				UtilLex.messErr("Trop de symbole");
+				UtilLex.messErr("Trop de symbole dans TabSymb ptgen 203");
 			}
 			break;
 		case 204: // ajout du parammod dans tabSymb
 			if (presentIdent(bc) > 0) {
-				UtilLex.messErr("parammod deja declaree");
+				UtilLex.messErr("parammod deja declare ptgen 204");
 			}
 			if (it < MAXSYMB) {
 				int addrVar = -1;
@@ -519,11 +533,11 @@ public class PtGen {
 				} else if(tabSymb[it].categorie == PARAMMOD || tabSymb[it].categorie == PARAMFIXE) {
 					addrVar = tabSymb[it].info + 1;
 				} else {
-					UtilLex.messErr("Erreur ajout parametre mod");
+					UtilLex.messErr("Erreur ajout parametre mod ptgen 204");
 				}
 				placeIdent(UtilLex.numId, PARAMMOD, tCour, addrVar);
 			} else {
-				UtilLex.messErr("Trop de symbole");
+				UtilLex.messErr("Trop de symbole dans TabSymb ptgen 204");
 			}
 			break;
 		case 207: // Actualisation du nombre de parametres de la proc
