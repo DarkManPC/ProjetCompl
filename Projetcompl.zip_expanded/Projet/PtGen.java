@@ -233,7 +233,7 @@ public class PtGen {
 			break;
 		case 9:// Ajout de la var dans tabSymb
 				// Doit-on verifier qu'elle existe deja ? /!\/!\
-			if (presentIdent(1) > 0) {
+			if (presentIdent(bc) > 0) {
 				UtilLex.messErr("Ident deja declaree ptgen 9");
 			}
 			if (it < MAXSYMB) {
@@ -272,7 +272,7 @@ public class PtGen {
 
 		/**** Expression ****/
 
-		case 20:// Recuperation et ajout numId dans la pile
+		case 20:// Recuperation et ajout numId dans la pile [PROC OK]
 			int posIdent = presentIdent(1);
 			if (posIdent > 0) {
 				if (tabSymb[posIdent].categorie == CONSTANTE) {
@@ -283,6 +283,16 @@ public class PtGen {
 					tCour = tabSymb[posIdent].type;
 					po.produire(CONTENUG);
 					po.produire(tabSymb[posIdent].info);
+				}else if(tabSymb[posIdent].categorie == VARLOCALE || tabSymb[posIdent].categorie == PARAMFIXE) {
+					tCour = tabSymb[posIdent].type;
+					po.produire(CONTENUL);
+					po.produire(tabSymb[posIdent].info);
+					po.produire(0);
+				}else if(tabSymb[posIdent].categorie == PARAMMOD) {
+					tCour = tabSymb[posIdent].type;
+					po.produire(CONTENUL);
+					po.produire(tabSymb[posIdent].info);
+					po.produire(1);
 				} else {
 					UtilLex.messErr("Ident n'est ni une variable, ni une constante ptgen 20");
 				}
@@ -290,78 +300,78 @@ public class PtGen {
 				UtilLex.messErr("Variable ou constante inexistante ptgen 20");
 			}
 			break;
-		case 21:// verification tCour = BOOL
+		case 21:// verification tCour = BOOL [PROC OK]
 			verifBool();
 			break;
-		case 22:// verification tCour = BOOL + produire OU
+		case 22:// verification tCour = BOOL + produire OU [PROC OK]
 			verifBool();
 			po.produire(OU);
 			break;
-		case 23:// verification tCour = BOOL + produire ET
+		case 23:// verification tCour = BOOL + produire ET [PROC OK]
 			verifBool();
 			po.produire(ET);
 			break;
-		case 24:// verification tCour = BOOL + produire NON
+		case 24:// verification tCour = BOOL + produire NON [PROC OK]
 			verifBool();
 			po.produire(NON);
 			break;
-		case 25:// verification tCour = ENT
+		case 25:// verification tCour = ENT [PROC OK]
 			verifEnt();
 			break;
-		case 26:// verification tCour = ENT + produire = + tCour = BOOL
+		case 26:// verification tCour = ENT + produire = + tCour = BOOL [PROC OK]
 			verifEnt();
 			po.produire(EG);
 			tCour = BOOL;
 			break;
-		case 27:// verification tCour = ENT + produire <> + tCour = BOOL
+		case 27:// verification tCour = ENT + produire <> + tCour = BOOL [PROC OK]
 			verifEnt();
 			po.produire(DIFF);
 			tCour = BOOL;
 			break;
-		case 28:// verification tCour = ENT + produire > + tCour = BOOL
+		case 28:// verification tCour = ENT + produire > + tCour = BOOL [PROC OK]
 			verifEnt();
 			po.produire(SUP);
 			tCour = BOOL;
 			break;
-		case 29:// verification tCour = ENT + produire >= + tCour = BOOL
+		case 29:// verification tCour = ENT + produire >= + tCour = BOOL [PROC OK]
 			verifEnt();
 			po.produire(SUPEG);
 			tCour = BOOL;
 			break;
-		case 30:// verification tCour = ENT + produire < + tCour = BOOL
+		case 30:// verification tCour = ENT + produire < + tCour = BOOL [PROC OK]
 			verifEnt();
 			po.produire(INF);
 			tCour = BOOL;
 			break;
-		case 31:// verification tCour = ENT + produire <= + tCour = BOOL
+		case 31:// verification tCour = ENT + produire <= + tCour = BOOL [PROC OK]
 			verifEnt();
 			po.produire(INFEG);
 			tCour = BOOL;
 			break;
-		case 32:// verification tCour = ENT + produire ADD
+		case 32:// verification tCour = ENT + produire ADD [PROC OK] 
 			verifEnt();
 			po.produire(ADD);
 			break;
-		case 33:// verification tCour = ENT + produire SOUS
+		case 33:// verification tCour = ENT + produire SOUS [PROC OK]
 			verifEnt();
 			po.produire(SOUS);
 			break;
-		case 34:// verification tCour = ENT + produire MUL
+		case 34:// verification tCour = ENT + produire MUL [PROC OK]
 			verifEnt();
 			po.produire(MUL);
 			break;
-		case 35:// verification tCour = ENT + produire DIV
+		case 35:// verification tCour = ENT + produire DIV [PROC OK]
 			verifEnt();
 			po.produire(DIV);
 			break;
-		case 36:// Ajout dans la pile de vCour
-			po.produire(EMPILER);
+		case 36:// Ajout dans la pile de vCour [PROC OK]
+			po.produire(EMPILER); 
 			po.produire(vCour);
 			break;
 			
 			/**** Ecriture / Lecture / Affectation ****/
 			
-		case 40:// Ecriture
+		case 40:// Ecriture [PROC OK]
 			if (tCour == BOOL) {
 				po.produire(ECRBOOL);
 			} else if (tCour == ENT) {
@@ -370,18 +380,29 @@ public class PtGen {
 				UtilLex.messErr("Ecriture impossible car pas bool ni ent ptgen 40");
 			}
 			break;
-		case 41:// Lecture
+		case 41:// Lecture [PROC OK]
 			int tmp = presentIdent(bc);
 			if (tmp > 0 && tabSymb[tmp].type == ENT) {
 				po.produire(LIRENT);
-				po.produire(AFFECTERG);
-				po.produire(tabSymb[tmp].info);
 			} else if (tmp > 0 && tabSymb[tmp].type == BOOL) {
 				po.produire(LIREBOOL);
-				po.produire(AFFECTERG);
-				po.produire(tabSymb[tmp].info);
 			} else {
 				UtilLex.messErr("Lecture impossible, var inexistante ptgen 41");
+			}
+			
+			if(tabSymb[tmp].categorie == VARGLOBALE) {
+				po.produire(AFFECTERG);
+				po.produire(tabSymb[tmp].info);
+			}else if(tabSymb[tmp].categorie == VARLOCALE) {
+				po.produire(AFFECTERL);
+				po.produire(tabSymb[tmp].info);
+				po.produire(0);
+			}else if(tabSymb[tmp].categorie == PARAMMOD) {
+				po.produire(AFFECTERL);
+				po.produire(tabSymb[tmp].info);
+				po.produire(1);
+			}else {
+				UtilLex.messErr("mauvais type var ptgen 41");
 			}
 
 			break;
@@ -408,7 +429,7 @@ public class PtGen {
 			}
 			break;
 		case 51: // Sauvegarde var affect dest [PROC OK]
-			affect = presentIdent(bc);
+			affect = presentIdent(1);
 			break;
 			
 		/**** Conditions ****/
@@ -487,6 +508,8 @@ public class PtGen {
 			
 		/**** Proc ****/
 			
+			/**** Decl ****/
+			
 		case 200: // creation BINCOND avant procs + pileRep
 			po.produire(BINCOND);
 			po.produire(-1);
@@ -554,6 +577,32 @@ public class PtGen {
 				tabSymb[i].code = -1;
 			}
 			bc = 1;
+			break;
+			
+			/**** Appel ****/
+			
+		case 220: // appel proc
+			tmp = affect;
+			po.produire(APPEL);
+			po.produire(tabSymb[tmp].info);
+			po.produire(tabSymb[tmp+1].info);
+			break;
+		case 221: // ajout dans la pile d'un parametre mod 
+			tmp = presentIdent(1);
+			if(tabSymb[tmp].categorie == VARGLOBALE) {
+				po.produire(EMPILERADG);
+				po.produire(tabSymb[tmp].info);
+			}else if (tabSymb[tmp].categorie == VARLOCALE) {
+				po.produire(EMPILERADL);
+				po.produire(tabSymb[tmp].info);
+				po.produire(0);
+			}else if (tabSymb[tmp].categorie == PARAMMOD) {
+				po.produire(EMPILERADL);
+				po.produire(tabSymb[tmp].info);
+				po.produire(1);
+			}else {
+				UtilLex.messErr("Mauvais type de var ptgen 221");
+			}
 			break;
 
 		/**** Arret ****/
