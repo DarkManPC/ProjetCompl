@@ -238,11 +238,11 @@ public class PtGen {
 			}
 			if (it < MAXSYMB) {
 				int addrVar;
-				if (it == 0 || tabSymb[it].categorie == CONSTANTE || tabSymb[it].categorie == PRIVEE) {
+				if (it == 0 || (tabSymb[it].categorie == CONSTANTE && categorieVar != VARLOCALE) || tabSymb[it].categorie == PRIVEE) {
 					addrVar = 0;
 				}
-				else if(tabSymb[it].categorie == PARAMFIXE || tabSymb[it].categorie == PARAMMOD) {
-					addrVar = tabSymb[it].info + 3;
+				else if(tabSymb[it].categorie == PARAMFIXE || tabSymb[it].categorie == PARAMMOD ||tabSymb[it].categorie == CONSTANTE) {
+					addrVar = tabSymb[bc - 1].info + 2;
 				} else {
 					addrVar = tabSymb[it].info + 1;
 				}
@@ -583,9 +583,13 @@ public class PtGen {
 			
 		case 220: // appel proc
 			tmp = affect;
-			po.produire(APPEL);
-			po.produire(tabSymb[tmp].info);
-			po.produire(tabSymb[tmp+1].info);
+			if(tabSymb[tmp].categorie == PROC){
+				po.produire(APPEL);
+				po.produire(tabSymb[tmp].info);
+				po.produire(tabSymb[tmp+1].info);
+			}else{
+				UtilLex.messErr("pas proc ptgen 220");
+			}
 			break;
 		case 221: // ajout dans la pile d'un parametre mod 
 			tmp = presentIdent(1);
@@ -610,6 +614,7 @@ public class PtGen {
 		case 999:
 			po.produire(ARRET);
 			afftabSymb();
+			po.constObj();
 			break;
 		
 		
