@@ -24,6 +24,8 @@
 
 import java.io.*;
 
+import javax.lang.model.util.ElementScanner6;
+
 // classe de mise en oeuvre du compilateur
 // =======================================
 // (verifications semantiques + production du code objet)
@@ -286,10 +288,7 @@ public class PtGen {
 					tCour = tabSymb[posIdent].type;
 					po.produire(CONTENUG);
 					po.produire(tabSymb[posIdent].info);
-					if(desc.getUnite().equals("module")) {
-						po.vecteurTrans(1);
-						desc.incrNbTansExt();
-					}
+					modifVecteurTrans(TRANSDON);
 				}else if(tabSymb[posIdent].categorie == VARLOCALE || tabSymb[posIdent].categorie == PARAMFIXE) {
 					tCour = tabSymb[posIdent].type;
 					po.produire(CONTENUL);
@@ -400,10 +399,7 @@ public class PtGen {
 			if(tabSymb[tmp].categorie == VARGLOBALE) {
 				po.produire(AFFECTERG);
 				po.produire(tabSymb[tmp].info);
-				if(desc.getUnite().equals("module")) {
-					po.vecteurTrans(1);
-					desc.incrNbTansExt();
-				}
+				modifVecteurTrans(TRANSDON);
 			}else if(tabSymb[tmp].categorie == VARLOCALE) {
 				po.produire(AFFECTERL);
 				po.produire(tabSymb[tmp].info);
@@ -423,10 +419,7 @@ public class PtGen {
 					&& ((tabSymb[tmp].type == ENT && tCour == ENT) || (tabSymb[tmp].type == BOOL && tCour == BOOL))) {
 				po.produire(AFFECTERG);
 				po.produire(tabSymb[tmp].info);
-				if(desc.getUnite().equals("module")) {
-					po.vecteurTrans(1);
-					desc.incrNbTansExt();
-				}
+				modifVecteurTrans(TRANSDON);
 			} else if(tmp > 0 && tabSymb[tmp].categorie == VARLOCALE
 					&& ((tabSymb[tmp].type == ENT && tCour == ENT) || (tabSymb[tmp].type == BOOL && tCour == BOOL))){
 				po.produire(AFFECTERL);
@@ -455,19 +448,13 @@ public class PtGen {
 			verifBool();
 			po.produire(BSIFAUX);
 			po.produire(-1);
-			if(desc.getUnite().equals("module")) {
-				po.vecteurTrans(2);
-				desc.incrNbTansExt();
-			}
+			modifVecteurTrans(TRANSCODE);
 			pileRep.empiler(po.getIpo());
 			break;
 		case 101: // production code MAPILE "sinon" [PROC OK]
 			po.produire(BINCOND);
 			po.produire(-1);
-			if(desc.getUnite().equals("module")) {
-				po.vecteurTrans(2);
-				desc.incrNbTansExt();
-			}
+			modifVecteurTrans(TRANSCODE);
 			po.modifier(pileRep.depiler(), po.getIpo()+1);
 			pileRep.empiler(po.getIpo());
 			break;
@@ -484,19 +471,13 @@ public class PtGen {
 			verifBool();
 			po.produire(BSIFAUX);
 			po.produire(-1);
-			if(desc.getUnite().equals("module")) {
-				po.vecteurTrans(2);
-				desc.incrNbTansExt();
-			}
+			modifVecteurTrans(TRANSCODE);
 			pileRep.empiler(po.getIpo());
 			break;
 		case 112: // depilement pile reprise + mise a jour code MAPILE [PROC OK]
 			po.modifier(pileRep.depiler(), po.getIpo()+3);
 			po.produire(BINCOND);
-			if(desc.getUnite().equals("module")) {
-				po.vecteurTrans(2);
-				desc.incrNbTansExt();
-			}
+			modifVecteurTrans(TRANSCODE);
 			po.produire(pileRep.depiler());
 			break;
 		
@@ -508,30 +489,21 @@ public class PtGen {
 		case 121: // verif bool + mise a jour pile reprise + production MAPILE "cond" [PROC OK]
 			verifBool();
 			po.produire(BSIFAUX);
-			if(desc.getUnite().equals("module")) {
-				po.vecteurTrans(2);
-				desc.incrNbTansExt();
-			}
+			modifVecteurTrans(TRANSCODE);
 			po.produire(-1);
 			pileRep.empiler(po.getIpo());
 			break;
 		case 122: // actualisation pile reprise + mise a jour code MAPILE [PROC OK]
 			po.modifier(pileRep.depiler(), po.getIpo()+3);
 			po.produire(BINCOND);
-			if(desc.getUnite().equals("module")) {
-				po.vecteurTrans(2);
-				desc.incrNbTansExt();
-			}
+			modifVecteurTrans(TRANSCODE);
 			po.produire(pileRep.depiler());
 			pileRep.empiler(po.getIpo());
 			break;
 		case 123: // actualisation pile reprise + mise a jour code MAPILE pour"aut" [PROC OK]
 			po.modifier(pileRep.depiler(), po.getIpo()+3);
 			po.produire(BINCOND);
-			if(desc.getUnite().equals("module")) {
-				po.vecteurTrans(2);
-				desc.incrNbTansExt();
-			}
+			modifVecteurTrans(TRANSCODE);
 			po.produire(pileRep.depiler());
 			pileRep.empiler(po.getIpo());
 			break;
@@ -554,16 +526,17 @@ public class PtGen {
 			/**** Decl ****/
 			
 		case 200: // creation BINCOND avant procs + pileRep
-			po.produire(BINCOND);
-			po.produire(-1);
-			if(desc.getUnite().equals("module")) {
-				po.vecteurTrans(2);
-				desc.incrNbTansExt();
+			if(desc.getUnite().equals("programme")) {
+				po.produire(BINCOND);
+				po.produire(-1);
+				modifVecteurTrans(TRANSCODE);
+				pileRep.empiler(po.getIpo());
 			}
-			pileRep.empiler(po.getIpo());
 			break;
 		case 201: // Actualisation BINCOND avant procs + pileRep
-			po.modifier(pileRep.depiler(), po.getIpo()+1);
+			if(desc.getUnite().equals("programme")) {
+				po.modifier(pileRep.depiler(), po.getIpo()+1);
+			}
 			break;
 		case 202: // ajout de la proc dans tabSymb
 			if(presentIdent(bc) > 0){
@@ -638,11 +611,10 @@ public class PtGen {
 			
 		case 220: // appel proc
 			tmp = affect;
-			if(tabSymb[tmp].categorie == PROC){
+			if(tmp > 0 && tabSymb[tmp].categorie == PROC){
 				po.produire(APPEL);
 				po.produire(tabSymb[tmp].info);
-				po.vecteurTrans(3);
-				desc.incrNbTansExt();
+				modifVecteurTrans(REFEXT);
 				po.produire(tabSymb[tmp+1].info);
 			}else{
 				UtilLex.messErr("pas proc ptgen 220");
@@ -653,10 +625,7 @@ public class PtGen {
 			if(tabSymb[tmp].categorie == VARGLOBALE) {
 				po.produire(EMPILERADG);
 				po.produire(tabSymb[tmp].info);
-				if(desc.getUnite().equals("module")) {
-					po.vecteurTrans(1);
-					desc.incrNbTansExt();
-				}
+				modifVecteurTrans(TRANSDON);
 			}else if (tabSymb[tmp].categorie == VARLOCALE) {
 				po.produire(EMPILERADL);
 				po.produire(tabSymb[tmp].info);
@@ -672,25 +641,82 @@ public class PtGen {
 		
 		/**** Reference ****/
 		
-		case 300: // ajout de la ref dans tabRef
+		case 300: // ajout de la ref dans tabRef et dans tabSymb
 			desc.ajoutRef(UtilLex.repId(UtilLex.numId));
+			desc.modifRefNbParam(desc.getNbRef(), 0);
+
+			if(presentIdent(bc) > 0){
+				UtilLex.messErr("proc deja declaree ptgen 202");
+			}
+			placeIdent(UtilLex.numId, PROC, NEUTRE, desc.getNbRef());
+			placeIdent(-1, PRIVEE, NEUTRE, 0);
 			break;
 			
-		case 301: // actualisation nbParam
+		case 301: // actualisation nbParam fixe
 			desc.modifRefNbParam(desc.getNbRef(), desc.getRefNbParam(desc.getNbRef())+1);
+
+			tmp = presentIdent(1);
+
+			if(tmp > 0){
+				tabSymb[tmp+1].info = tabSymb[tmp+1].info + 1;
+			}else{
+				UtilLex.messErr("proc inexistante ptgen 301");
+			}
+
+			if (it < MAXSYMB) {
+				int addrVar = -1;
+				if (tabSymb[it].categorie == PRIVEE) {
+					addrVar = 0;
+				} else if(tabSymb[it].categorie == PARAMFIXE) {
+					addrVar = tabSymb[it].info + 1;
+				} else {
+					UtilLex.messErr("Erreur ajout parametre fixe ptgen 301");
+				}
+				placeIdent(-1, PARAMFIXE, tCour, addrVar);
+				
+			} else {
+				UtilLex.messErr("Trop de symbole dans TabSymb ptgen 301");
+			}
+
 			break;
-			
-		case 302: // actualisation unité programme
+
+		case 302: // actualisation nbParam mod
+			desc.modifRefNbParam(desc.getNbRef(), desc.getRefNbParam(desc.getNbRef())+1);
+
+			tmp = presentIdent(1);
+
+			if(tmp > 0){
+				tabSymb[tmp+1].info = tabSymb[tmp+1].info + 1;
+			}else{
+				UtilLex.messErr("proc inexistante ptgen 301");
+			}
+
+			if (it < MAXSYMB) {
+				int addrVar = -1;
+				if (tabSymb[it].categorie == PRIVEE) {
+					addrVar = 0;
+				} else if(tabSymb[it].categorie == PARAMMOD || tabSymb[it].categorie == PARAMFIXE) {
+					addrVar = tabSymb[it].info + 1;
+				} else {
+					UtilLex.messErr("Erreur ajout parametre mod ptgen 302");
+				}
+				placeIdent(-1, PARAMMOD, tCour, addrVar);
+			} else {
+				UtilLex.messErr("Trop de symbole dans TabSymb ptgen 302");
+			}
+			break;
+		case 303: // actualisation unitï¿½ programme
 			desc.setUnite("programme");
 			break;
 			
-		case 303: // actualisation unité module
+		case 304: // actualisation unitï¿½ module
 			desc.setUnite("module");			
 			break;
-		case 304: // actualisation taille code
+		case 305: // actualisation taille code
 			desc.setTailleCode(po.getIpo());
+			desc.ecrireDesc(UtilLex.nomSource);
 			break;
-		case 305: // ajout de la def dans tabRef
+		case 306: // ajout de la def dans tabRef
 			desc.ajoutDef(UtilLex.repId(UtilLex.numId));
 			break;
 			
