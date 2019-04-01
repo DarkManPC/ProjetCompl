@@ -732,8 +732,8 @@ public class PtGen {
 			}else {
 				UtilLex.messErr("Erreur arret ptgen 999");
 			}
-			afftabSymb();
-			po.constObj();
+			//afftabSymb();
+			//po.constObj();
 			break;
 		
 		
@@ -744,8 +744,8 @@ public class PtGen {
 			break;
 
 		}
-		//po.constObj();
-		afftabSymb();
+		po.constObj();
+		//afftabSymb();
 		po.constGen();
 
 	}

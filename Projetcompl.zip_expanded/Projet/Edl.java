@@ -68,11 +68,17 @@ public class Edl {
 		if (f2 == null)
 			erreur(FATALE, "creation du fichier " + nomProg
 					+ ".map impossible");
-		// pour construire le code concatene de toutes les unités
+		// pour construire le code concatene de toutes les unitï¿½s
 		int[] po = new int[(nMod + 1) * MAXOBJ + 1];
-// 
-// ... A COMPLETER ...
-//
+
+		InputStream obj = Lecture.ouvrir(nomProg +".obj");
+
+		while(!Lecture.finFichier(obj)){
+			System.out.println(Lecture.lireIntln(obj));
+		}
+
+		Lecture.fermer(obj);
+
 		Ecriture.fermer(f2);
 		// creation du fichier en mnemonique correspondant
 		Mnemo.creerFichier(ipo, po, nomProg + ".ima");
