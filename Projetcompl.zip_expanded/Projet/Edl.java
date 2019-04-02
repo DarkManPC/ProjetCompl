@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.HashMap;
 
 
 public class Edl {
@@ -21,6 +22,7 @@ public class Edl {
 	// declarations de variables A COMPLETER SI BESOIN
 	static int ipo, nMod, nbErr;
 	static String nomProg;
+	static String[] nomModule = new String[5];
 
 	// utilitaire de traitement des erreurs
 	// ------------------------------------
@@ -55,6 +57,7 @@ public class Edl {
 				nMod = nMod + 1;
 				tabDesc[nMod] = new Descripteur();
 				tabDesc[nMod].lireDesc(s);
+				nomModule[nMod-1] = s;
 				if (!tabDesc[nMod].getUnite().equals("module"))
 					erreur(FATALE, "module attendu");
 			}
@@ -70,16 +73,142 @@ public class Edl {
 					+ ".map impossible");
 		// pour construire le code concatene de toutes les unit�s
 		int[] po = new int[(nMod + 1) * MAXOBJ + 1];
-
+		
+		int[][] trans = new int[tabDesc.length][2];
+		HashMap<String, int[]> dicoDef = new HashMap<String, int[]>();
+		int[][] adFinale = new int[6][11];
+		
+		int nbReserver = 0;
+		
+		for(int i = 0; i < nMod+1; i++) {
+			
+			nbReserver += tabDesc[i].getTailleGlobaux();
+			
+			if(i == 0) {
+				trans[0][0] = 0;
+				trans[0][1] = 0;
+			} else {
+				trans[i][0] = trans[i-1][0] + tabDesc[i-1].getTailleGlobaux();
+				trans[i][1] = trans[i-1][1] + tabDesc[i-1].getTailleCode();
+			}
+			
+			for(int j = 1; j < tabDesc[i].getNbDef() + 1; j++) {
+				int[] tmp = new int[2];
+				tmp[0] = tabDesc[i].getDefAdPo(j) + trans[i][1];
+				tmp[1] = tabDesc[i].getDefNbParam(j);
+				
+				if(dicoDef.size() < 61 && dicoDef.get(tabDesc[i].getDefNomProc(j)) == null) {
+					dicoDef.put(tabDesc[i].getDefNomProc(j), tmp);
+				} else {
+					erreur(FATALE, "Plusieurs fois meme Def ou trop de Def");
+				}
+			}
+		
+		}
+		
+		for(int i = 0; i < nMod+1; i++) {
+			for(int k = 1; k < tabDesc[i].getNbRef() + 1; k++) {
+				adFinale[i][k-1] = dicoDef.get(tabDesc[i].getRefNomProc(k))[0];
+			}
+		}
+		
+		int nbTransExt = tabDesc[0].getNbTransExt(); 
+		
 		InputStream obj = Lecture.ouvrir(nomProg +".obj");
-
+		
+		HashMap<Integer, Integer> transExt = new HashMap<Integer, Integer>(); 
+		
+		while(nbTransExt > 0) {
+			transExt.put(Lecture.lireInt(obj),  Lecture.lireInt(obj));
+			nbTransExt--;
+		}
+		
+		
+		po[1] = 1;
+		Ecriture.ecrireInt(f2, po[1]);
+		Ecriture.ecrireChar(f2, '\n');
+		po[2] = nbReserver;
+		Ecriture.ecrireInt(f2, po[2]);
+		Ecriture.ecrireChar(f2, '\n');
+			
+		Lecture.lireInt(obj);
+		Lecture.lireInt(obj); 
+			
+		
+		
+		ipo = 2;
+		
 		while(!Lecture.finFichier(obj)){
-			System.out.println(Lecture.lireIntln(obj));
+			ipo++;
+			if(transExt.get(ipo) == null) {
+				po[ipo] = Lecture.lireInt(obj);
+			} else {
+				switch(transExt.get(ipo)) {
+					case TRANSDON:
+						po[ipo] = Lecture.lireInt(obj) + trans[0][0];
+						break;
+					case TRANSCODE:
+						po[ipo] = Lecture.lireInt(obj) + trans[0][1];
+						break;
+					case REFEXT:
+						po[ipo] = adFinale[0][Lecture.lireInt(obj)-1];
+						break;
+				}
+				
+			}
+			
+			Ecriture.ecrireInt(f2, po[ipo]);
+			Ecriture.ecrireChar(f2, '\n');
 		}
 
 		Lecture.fermer(obj);
+		
+		for(int i = 0; i < nMod; i++) {
+			
+			nbTransExt = tabDesc[i+1].getNbTransExt(); 
+			
+			obj = Lecture.ouvrir(nomModule[i] +".obj");
+		
+			transExt = new HashMap<Integer, Integer>(); 
+		
+			while(nbTransExt > 0) {
+				transExt.put(Lecture.lireInt(obj),  Lecture.lireInt(obj));
+				nbTransExt--;
+			}
+			
+			int indexMod = 1;
+		
+			while(!Lecture.finFichier(obj)){
+				ipo++;
+				if(transExt.get(indexMod) == null) {
+					po[ipo] = Lecture.lireInt(obj);
+				
+				} else {
+					
+					switch(transExt.get(indexMod)) {
+						case TRANSDON:
+							po[ipo] = Lecture.lireInt(obj) + trans[i+1][0];
+							break;
+						case TRANSCODE:
+							po[ipo] = Lecture.lireInt(obj) + trans[i+1][1];
+							break;
+						case REFEXT:
+							po[ipo] = adFinale[i+1][Lecture.lireInt(obj)-1];
+							break;
+					}
+					
+					
+				}
+				indexMod++;
+				
+				Ecriture.ecrireInt(f2, po[ipo]);
+				Ecriture.ecrireChar(f2, '\n');
+			}
+			Lecture.fermer(obj);
+		}
 
 		Ecriture.fermer(f2);
+		
 		// creation du fichier en mnemonique correspondant
 		Mnemo.creerFichier(ipo, po, nomProg + ".ima");
 	}

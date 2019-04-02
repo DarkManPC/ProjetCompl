@@ -585,14 +585,15 @@ public class PtGen {
 			break;
 		case 207: // Actualisation du nombre de parametres de la proc + actualisation tabDef 
 			tabSymb[bc-1].info = it - bc + 1;
-			tmp = desc.presentDef(UtilLex.repId(tabSymb[bc-2].code));
-			if(tmp > 0) {
-				desc.modifDefNbParam(tmp, tabSymb[bc-1].info);
-				desc.modifDefAdPo(tmp, tabSymb[bc-2].info);
-			} else {
-				UtilLex.messErr("Def inexistante ptgen 207");
+			if(desc.getUnite().equals("module")) {
+				tmp = desc.presentDef(UtilLex.repId(tabSymb[bc-2].code));
+				if(tmp > 0) {
+					desc.modifDefNbParam(tmp, tabSymb[bc-1].info);
+					desc.modifDefAdPo(tmp, tabSymb[bc-2].info);
+				} else {
+					UtilLex.messErr("Def inexistante ptgen 207");
+				}
 			}
-			
 			break;
 		case 208:// Sauvegarde de la categorie de la variable
 			categorieVar = VARLOCALE;
