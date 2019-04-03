@@ -261,15 +261,17 @@ public class PtGen {
 					po.produire(nbVar);
 				}
 				desc.setTailleGlobaux(nbVar);
-			} else if(tabSymb[it].categorie == VARLOCALE) {
+			} else {
+				po.produire(RESERVER);
+				po.produire(0);
+			}
+			break;
+		case 11:
+			if(tabSymb[it].categorie == VARLOCALE) {
 				int nbVar = tabSymb[it].info - (tabSymb[bc-1].info + 1);
 				po.produire(RESERVER);
 				po.produire(nbVar);
-			} else {
-				UtilLex.messErr("Pas de variable dans tabSymb ptgen 10");
 			}
-			break;
-		case 11:// Me souviens plus de ce qu'il est sensé faire
 			break;
 		case 12:// Sauvegarde de la categorie de la variable
 			categorieVar = VARGLOBALE;
@@ -615,7 +617,9 @@ public class PtGen {
 			if(tmp > 0 && tabSymb[tmp].categorie == PROC){
 				po.produire(APPEL);
 				po.produire(tabSymb[tmp].info);
-				modifVecteurTrans(REFEXT);
+				if(desc.presentRef(UtilLex.repId(tabSymb[tmp].code)) > 0){
+					modifVecteurTrans(REFEXT);
+				}
 				po.produire(tabSymb[tmp+1].info);
 			}else{
 				UtilLex.messErr("pas proc ptgen 220");
@@ -714,6 +718,11 @@ public class PtGen {
 			desc.setUnite("module");			
 			break;
 		case 305: // actualisation taille code
+			for(int i = 1; i < desc.getNbDef() + 1; i++){
+				if(desc.getDefAdPo(i) < 0){
+					UtilLex.messErr("Def non défini ou mal défini ptgen 305");
+				}
+			}
 			desc.setTailleCode(po.getIpo());
 			desc.ecrireDesc(UtilLex.nomSource);
 			break;
