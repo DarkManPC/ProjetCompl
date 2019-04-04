@@ -23,6 +23,12 @@ public class Edl {
 	static int ipo, nMod, nbErr;
 	static String nomProg;
 	static String[] nomModule = new String[5];
+	
+	static int[][] trans = new int[tabDesc.length][2];
+	static HashMap<String, int[]> dicoDef = new HashMap<String, int[]>();
+	static int[][] adFinale = new int[6][11];
+	
+	static int nbReserver = 0;
 
 	// utilitaire de traitement des erreurs
 	// ------------------------------------
@@ -73,44 +79,6 @@ public class Edl {
 					+ ".map impossible");
 		// pour construire le code concatene de toutes les unit�s
 		int[] po = new int[(nMod + 1) * MAXOBJ + 1];
-		
-		int[][] trans = new int[tabDesc.length][2];
-		HashMap<String, int[]> dicoDef = new HashMap<String, int[]>();
-		int[][] adFinale = new int[6][11];
-		
-		int nbReserver = 0;
-		
-		for(int i = 0; i < nMod+1; i++) {
-			
-			nbReserver += tabDesc[i].getTailleGlobaux();
-			
-			if(i == 0) {
-				trans[0][0] = 0;
-				trans[0][1] = 0;
-			} else {
-				trans[i][0] = trans[i-1][0] + tabDesc[i-1].getTailleGlobaux();
-				trans[i][1] = trans[i-1][1] + tabDesc[i-1].getTailleCode();
-			}
-			
-			for(int j = 1; j < tabDesc[i].getNbDef() + 1; j++) {
-				int[] tmp = new int[2];
-				tmp[0] = tabDesc[i].getDefAdPo(j) + trans[i][1];
-				tmp[1] = tabDesc[i].getDefNbParam(j);
-				
-				if(dicoDef.size() < 61 && dicoDef.get(tabDesc[i].getDefNomProc(j)) == null) {
-					dicoDef.put(tabDesc[i].getDefNomProc(j), tmp);
-				} else {
-					erreur(FATALE, "Plusieurs fois meme Def ou trop de Def");
-				}
-			}
-		
-		}
-		
-		for(int i = 0; i < nMod+1; i++) {
-			for(int k = 1; k < tabDesc[i].getNbRef() + 1; k++) {
-				adFinale[i][k-1] = dicoDef.get(tabDesc[i].getRefNomProc(k))[0];
-			}
-		}
 		
 		int nbTransExt = tabDesc[0].getNbTransExt(); 
 		
@@ -222,9 +190,44 @@ public class Edl {
 		// Phase 1 de l'edition de liens
 		// -----------------------------
 		lireDescripteurs();		// lecture des descripteurs a completer si besoin
-// 
-// ... A COMPLETER ...
-//
+
+		for(int i = 0; i < nMod+1; i++) {
+			
+			nbReserver += tabDesc[i].getTailleGlobaux();
+			
+			if(i == 0) {
+				trans[0][0] = 0;
+				trans[0][1] = 0;
+			} else {
+				trans[i][0] = trans[i-1][0] + tabDesc[i-1].getTailleGlobaux();
+				trans[i][1] = trans[i-1][1] + tabDesc[i-1].getTailleCode();
+			}
+			
+			for(int j = 1; j < tabDesc[i].getNbDef() + 1; j++) {
+				int[] tmp = new int[2];
+				tmp[0] = tabDesc[i].getDefAdPo(j) + trans[i][1];
+				tmp[1] = tabDesc[i].getDefNbParam(j);
+				
+				if(dicoDef.size() < 61 && dicoDef.get(tabDesc[i].getDefNomProc(j)) == null) {
+					dicoDef.put(tabDesc[i].getDefNomProc(j), tmp);
+				} else {
+					erreur(FATALE, "Plusieurs fois meme Def ou trop de Def");
+				}
+			}
+		
+		}
+		
+		for(int i = 0; i < nMod+1; i++) {
+			for(int k = 1; k < tabDesc[i].getNbRef() + 1; k++) {
+				int[] tmp = dicoDef.get(tabDesc[i].getRefNomProc(k));
+				if(tmp[1] == tabDesc[i].getRefNbParam(k)) {
+					adFinale[i][k-1] = tmp[0];
+				}else {
+					erreur(FATALE, "nombre de parametre incoherent entre les ref et les def");
+				}
+			}
+		}
+		
 		if (nbErr > 0) {
 			System.out.println("programme executable non produit");
 			System.exit(1);

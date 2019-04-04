@@ -105,7 +105,7 @@ FICHIER TestsProjet/polyP42-exemple-ess1.ima :
  203  empiler         1
  205  add       
  206  affecterg       4
- 208  retour          1
+ 208  retour          2
  210  contenug        4
  212  empiler         0
  214  diff      

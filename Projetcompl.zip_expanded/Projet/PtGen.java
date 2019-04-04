@@ -647,9 +647,12 @@ public class PtGen {
 		/**** Reference ****/
 		
 		case 300: // ajout de la ref dans tabRef et dans tabSymb
-			desc.ajoutRef(UtilLex.repId(UtilLex.numId));
-			desc.modifRefNbParam(desc.getNbRef(), 0);
-
+			if(desc.presentDef(UtilLex.repId(UtilLex.numId)) == 0) {
+				desc.ajoutRef(UtilLex.repId(UtilLex.numId));
+				desc.modifRefNbParam(desc.getNbRef(), 0);
+			}else {
+				UtilLex.messErr("Ref deja declaree ptgen 300");
+			}
 			if(presentIdent(bc) > 0){
 				UtilLex.messErr("proc deja declaree ptgen 202");
 			}
@@ -720,14 +723,18 @@ public class PtGen {
 		case 305: // actualisation taille code
 			for(int i = 1; i < desc.getNbDef() + 1; i++){
 				if(desc.getDefAdPo(i) < 0){
-					UtilLex.messErr("Def non défini ou mal défini ptgen 305");
+					UtilLex.messErr("Def non défini ou mal defini ptgen 305");
 				}
 			}
 			desc.setTailleCode(po.getIpo());
 			desc.ecrireDesc(UtilLex.nomSource);
 			break;
 		case 306: // ajout de la def dans tabRef
-			desc.ajoutDef(UtilLex.repId(UtilLex.numId));
+			if(desc.presentDef(UtilLex.repId(UtilLex.numId)) == 0) {
+				desc.ajoutDef(UtilLex.repId(UtilLex.numId));
+			}else {
+				UtilLex.messErr("Def deja declaree ptgen 306");
+			}
 			break;
 			
 			
@@ -755,7 +762,7 @@ public class PtGen {
 
 		}
 		po.constObj();
-		//afftabSymb();
+		afftabSymb();
 		po.constGen();
 
 	}
